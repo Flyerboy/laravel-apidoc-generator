@@ -34,6 +34,23 @@ class Generator
         return array_diff($route->methods(), ['HEAD']);
     }
 
+    protected static $groupId = 1;
+    protected static $groups = [];
+    protected function formatGroupName($name)
+    {
+        $key = md5($name);
+        if (!isset(self::$groups[$key])) {
+            self::$groups[$key] = [
+                'groupId' => self::$groupId,
+                'routeId' => 0
+            ];
+            self::$groupId++;
+        }
+
+        self::$groups[$key]['routeId'] += 1;
+        return self::$groups[$key];
+    }
+
     /**
      * @param  \Illuminate\Routing\Route $route
      * @param array $apply Rules to apply when generating documentation for this route
@@ -57,9 +74,11 @@ class Generator
             'query' => $queryParameters,
         ]);
 
+        $group = $this->formatGroupName($routeGroup);
         $parsedRoute = [
+            'cid' => $group['groupId'] . '_' . $group['routeId'],
             'id' => md5($this->getUri($route).':'.implode($this->getMethods($route))),
-            'group' => $routeGroup,
+            'group' => $group['groupId'] . '_' . $routeGroup,
             'title' => $docBlock['short'],
             'description' => $docBlock['long'],
             'methods' => $this->getMethods($route),

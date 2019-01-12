@@ -1,5 +1,5 @@
 <!-- START_{{$route['id']}} -->
-@if($route['title'] != '')## {{ $route['title']}}
+@if($route['title'] != '')## {{ $route['cid'] }} {{ $route['title']}}
 @else## {{$route['uri']}}@endif
 @if($route['authenticated'])
 
@@ -72,7 +72,11 @@ fetch(url, {
 @if(is_object($response['content']) || is_array($response['content']))
 {!! json_encode($response['content'], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) !!}
 @else
+@if(strpos($response['content'], '//') === false)
 {!! json_encode(json_decode($response['content']), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) !!}
+@else
+{!! $response['content'] !!}
+@endif
 @endif
 ```
 @endforeach
